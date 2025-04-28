@@ -12,10 +12,8 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     if (token) {
       localStorage.setItem("token", token);
-      setIsLoggedIn(true);
     } else {
-      localStorage.removeItem("token");
-      setIsLoggedIn(false);
+      localStorage.removeItem("token");     
     }
   }, [token]);
 

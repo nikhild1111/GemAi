@@ -68,31 +68,6 @@ const token = jwt.sign(payload, process.env.JWT_SECRET || "LASTCHANSE", {
     });
 
 
-       // Set token in cookie
-    //    res.cookie("token", token, options);
-    // // Success response
-    // return res.status(200).json({
-    //   success: true,
-    //   message: "Signup successful",
-    //   user: {
-    //     name: user.name,
-    //     email: user.email,
-    //     role: user.role,
-    //     phone: user.phone,
-    //   },
-    // });
-    // Success response
-    // return res.status(200).json({
-    //   success: true,
-    //   message: "Signup successful",
-    //   user: {
-    //     name: user.name,
-    //     email: user.email,
-    //     role: user.role,
-    //     phone: user.phone,
-    //   },
-    // });
-
   } catch (err) {
     console.error("Signup error:", err);
     return res.status(500).json({

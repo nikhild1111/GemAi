@@ -42,15 +42,16 @@ export const Login = async (req, res) => {
     const token = jwt.sign(
       payload,
       process.env.JWT_SECRET || "LASTCHANSE", // fallback if env var is missing
-      { expiresIn: "2h" }
+      { expiresIn: "30s" }
     );
 
     // 5. Set token in cookie
     const tokenExpiryDuration = 2 * 60 * 60 * 1000; // JWT expires in 2 hours
 
     const options = {
-      expires: new Date(Date.now() + tokenExpiryDuration),
-      httpOnly: true,
+      // expires: new Date(Date.now() + tokenExpiryDuration),
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      httpOnly: false,
     };
 
     res.cookie("token", token, options).status(200).json({

@@ -6,6 +6,7 @@ import cors from 'cors';
 import { dbConnect } from "./Config/database.js";
 import cookieParser from "cookie-parser";
 import Links from "./Routes/Linksuser.js";
+import history from "./Routes/history.js";
 import verifyToken from "./middlewares/verifyToken.js";  // Don't forget to import this
 import User from "./models/UserData.js"; // Needed for saveTopic route
 
@@ -13,9 +14,9 @@ const app = express();
 dotenv.config();
 
 //  Use env var instead of hardcoding API key (secure)
-const gemini_api_key = "AIzaSyAutDY9WF-UqQ3m99DTmQGKtPvXIT-_9hg";
-// const gemini_api_key=process.dotenv.gemini_api_key;
-// console.log(gemini_api_key);
+// const gemini_api_key = "AIzaSyAutDY9WF-UqQ3m99DTmQGKtPvXIT-_9hg";
+const gemini_api_key = process.env.GEMINI_API_KEY;
+
 const googleAI = new GoogleGenerativeAI(gemini_api_key);
 
 const geminiModel = googleAI.getGenerativeModel({
@@ -27,21 +28,26 @@ const port = process.env.PORT || 3000;
 //  Middlewares
 app.use(bodyParser.json());
 app.use(express.json());
-app.use(cors({ credentials: true, origin: "http://localhost:5173" })); // Update origin as needed
+app.use(cors({
+  origin: "http://localhost:5173", // React frontend
+  credentials: true               // 👈 allow sending cookies
+}));
+
+// app.use(cors({ credentials: true, origin: "http://localhost:5173" })); // Update origin as needed
 app.use(cookieParser());
 
 //  DB Connect
 dbConnect();
 
 // Main route
-app.use("/api/v1", Links);
+app.use("/api/v1", Links, history);
 
 // Generate content function
 const generate = async (question) => {
   try {
     const result = await geminiModel.generateContent(question);
     const response = result.response;
-    return response.text();  // Proper use of .text()
+    return response.text();  // Proper use of .text()`
   } catch (error) {
     console.error("response error", error);
     return "Failed to generate response";
@@ -78,17 +84,19 @@ Definition: [Your definition here]
 
 Make the explanation simple, clear, and suitable for college-level students.
 `;
-try{
-  const result = await generate(prompt);
-  res.json({
-    success:true,
-    result:result,
-    message:"Welcome to the Protect  route ",
-})}catch(error){
-  res.status(500).json({
-      success:false,
-      error:error.message,
-      message:"Fat Gya Code",});
+  try {
+    const result = await generate(prompt);
+    res.json({
+      success: true,
+      result: result,
+      message: "Welcome to the Protect  route ",
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      message: "Fat Gya Code",
+    });
   }
 });
 

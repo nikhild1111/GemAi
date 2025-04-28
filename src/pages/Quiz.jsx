@@ -1,21 +1,4 @@
-// // Quiz.jsx
-// import { useLocation } from "react-router-dom";
 
-// const Quiz = () => {
-//   const location = useLocation();
-//   const { topic, quizData } = location.state;
-
-//   return (
-//     <div className="p-4">
-//       <h2 className="text-2xl font-bold mb-4">Quiz on: {topic}</h2>
-//       <pre className="bg-gray-100 p-4 rounded text-sm whitespace-pre-wrap">
-//         {quizData}
-//       </pre>
-//     </div>
-//   );
-// };
-
-// export default Quiz;
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 

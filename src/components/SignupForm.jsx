@@ -25,8 +25,8 @@ const SignupForm = () => {
     const { name, email, password, confirmpassword, phone } = formData;
 
     if (!isValidEmail(email)) return toast.error('Invalid email format');
-    if (!isValidPassword(password)) return toast.error('Password must be strong');
-    if (password !== confirmpassword) return toast.error("Passwords do not match");
+    if (!isValidPassword(password)) return toast.error('Password must contain 8+ characters, with uppercase, lowercase, number, and special symbol');
+    if (password !== confirmpassword) return toast.error("Confirm Passwords do not match");
     if (!isValidPhoneNumber(phone)) return toast.error("Phone must be 10 digits");
 
     try {

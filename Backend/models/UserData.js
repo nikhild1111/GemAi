@@ -13,7 +13,8 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true
+    required: true,
+    
   },
   role: {
     type: String,
@@ -22,7 +23,8 @@ const userSchema = new mongoose.Schema({
   },
   phone: {
     type: Number,
-    required: true
+    required: true,
+    default:'8328879891'
   },
   topics: {
     type: Object,

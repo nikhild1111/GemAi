@@ -4,9 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import { useAppContext } from '../context/AppContext';
+import Cookies from 'js-cookie';
+import { GoogleLogin } from '@react-oauth/google';
 const LoginForm = () => {
 
-  const {setIsLoggedIn,setToken}=useAppContext();
+  const { setIsLoggedIn, setToken } = useAppContext();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
@@ -26,21 +28,26 @@ const LoginForm = () => {
     if (!isValidPassword(password)) return toast.error('Password must be strong');
 
     try {
-      const response = await axios.post('http://localhost:3000/api/v1/login', { email, password });
+      const response = await axios.post('http://localhost:3000/api/v1/login', { email, password },  {
+        withCredentials: true, // 👈 MUST
+      });
+
+      const token = Cookies.get('token');
+      // alert('Token:', token);
 
       if (response.data.success) {
-          // Assuming the backend sends a token in response
-      const { token } = response.data;
+        // Assuming the backend sends a token in response
+        const { token } = response.data;
 
-      // Save the token in localStorage (or sessionStorage)
-      localStorage.setItem("token", token);
+        // Save the token in localStorage (or sessionStorage)
+        localStorage.setItem("token", token);
 
         setIsLoggedIn(true);
         setToken(token);
         toast.success(response.data.message);
         navigate('/ask');
       } else {
-        
+
         toast.error(response.data.message);
       }
     } catch (err) {
@@ -90,6 +97,42 @@ const LoginForm = () => {
             Login
           </button>
         </form>
+         {/* Divider */}
+  <div className="flex items-center my-4">
+    <hr className="flex-grow border-t border-gray-300" />
+    <span className="mx-4 text-gray-400 text-sm">OR</span>
+    <hr className="flex-grow border-t border-gray-300" />
+  </div>
+
+  {/* GOOGLE LOGIN BUTTON */}
+  <div className="flex justify-center">
+    <GoogleLogin
+      onSuccess={credentialResponse => {
+        console.log(credentialResponse);
+
+        axios.post('http://localhost:3000/api/v1/google-login', {
+          token: credentialResponse.credential,
+        }, { withCredentials: true })
+        .then(response => {
+          console.log(response.data);
+
+          localStorage.setItem('token', response.data.token);
+          setIsLoggedIn(true);
+          setToken(response.data.token);
+          toast.success('Login successful!');
+          navigate('/ask');
+        })
+        .catch(error => {
+          console.error(error);
+          toast.error('Google login failed');
+        });
+      }}
+      onError={() => {
+        console.log('Login Failed');
+        toast.error('Google login failed');
+      }}
+    />
+  </div>
       </div>
     </div>
   );
