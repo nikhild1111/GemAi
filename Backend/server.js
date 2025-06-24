@@ -29,11 +29,22 @@ const port = process.env.PORT || 3000;
 
 //  Middlewares
 app.use(bodyParser.json());
-app.use(cors({
-  origin: "http://localhost:5173", // React frontend
-  credentials: true               // 👈 allow sending cookies
-}));
+// Replace this with your actual frontend URL
+const allowedOrigins = [
+  "http://localhost:5173",            // for local dev
+  "https://gemai-1.onrender.com"      // for deployed frontend
+];
 
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+}));
 // app.use(cors({ credentials: true, origin: "http://localhost:5173" })); // Update origin as needed
 app.use(cookieParser());
 
@@ -55,6 +66,14 @@ app.use('/api/resume', ResumeRoute);
 
 // Next, Express checks: is there a direct match with app.post("/api/content")?
 //  Yes — so it runs that route handler.
+
+app.get("/", (req, res) => {
+  res.status(200).json({
+    message: "✅ API is running successfully!",
+    status: "OK"
+  });
+});
+
 
 
 
