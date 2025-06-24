@@ -25,6 +25,7 @@
     "google-auth-library": "^9.15.1",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
+    "jspdf": "^3.0.1",
     "jwt-decode": "^4.0.0",
     "mongoose": "^8.13.2",
     "nodemailer": "^6.10.1",

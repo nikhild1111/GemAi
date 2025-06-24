@@ -13,7 +13,11 @@ import Flashcards from "./pages/Flashcards";
 import Premium from "./pages/Premium";
 import Saved from "./pages/Saved";
 import Quiz from "./pages/Quiz";
+import Timer from './components/Timer';
+import QnA from './pages/QnA';
+import UploadResume from './pages/UploadResume';
 import { useContext } from "react";
+import VerifyOtpPage from "./pages/VerifyOtpPage";
 // import jwt_decode from 'jwt-decode'; // This should work for your case
 
 // import { useEffect } from "react";
@@ -66,10 +70,14 @@ const App = () => {
       <Navbar setIsLoggedIn={setIsLoggedIn} isLogin={isLogin} />
       <Routes>
         <Route path="/" element={<Ask setIsLoggedIn={setIsLoggedIn} isLogin={isLogin} />} />
+          <Route path="/timer" element={<Timer />} />
+ <Route path="/uploadresume" element={<UploadResume />} />
+          <Route path="/qna" element={<QnA questions={[]} />} /> {/* Replace [] with context value later */}
         <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
         <Route path="/signup" element={<Signup setIsLoggedIn={setIsLoggedIn} />} />
         <Route path="/ask" element={<Ask setIsLoggedIn={setIsLoggedIn} isLogin={isLogin} />} />
         <Route path="/flashcards" element={<Flashcards />} />
+        <Route path="/verify" element={<VerifyOtpPage />} />
         <Route path="/premium" element={<Premium />} />
         <Route path="/saved" element={<Saved />} />
         <Route path="/quiz" element={<Quiz />} />

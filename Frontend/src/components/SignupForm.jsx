@@ -30,29 +30,35 @@ const SignupForm = () => {
     if (!isValidPhoneNumber(phone)) return toast.error("Phone must be 10 digits");
 
     try {
-      const response = await axios.post("http://localhost:3000/api/v1/signup", {
-        name,
-        email,
-        password,
-        phone,
-        // role: "user", // optional field, or set default in schema
-      });
-      if (response.data.success) {
-        // Assuming the backend sends a token in response
-      const { token } = response.data;
 
-      // Save the token in localStorage (or sessionStorage)
-      localStorage.setItem("token", token);
-      setToken(token);
-        // toast.success(response.data.message);
-        toast.success("Wellcome to study hub ");
-        setIsLoggedIn(true);
-        navigate("/ask");
-      } else {
-        toast.error(response.data.message || "Signup failed");
-      }
+      //  fiest go to the otp and check it then come back to the signup page 
+
+      await axios.post("http://localhost:3000/api/send-otp", { email });
+      navigate("/verify", { state: { email,name,password,phone } });
+
+      // const response = await axios.post("http://localhost:3000/api/v1/signup", {
+      //   name,
+      //   email,
+      //   password,
+      //   phone,
+      //   // role: "user", // optional field, or set default in schema
+      // });
+      // if (response.data.success) {
+      //   // Assuming the backend sends a token in response
+      // const { token } = response.data;
+
+      // // Save the token in localStorage (or sessionStorage)
+      // localStorage.setItem("token", token);
+      // setToken(token);
+      //   // toast.success(response.data.message);
+      //   toast.success("Wellcome to study hub ");
+      //   setIsLoggedIn(true);
+      //   navigate("/ask");
+      // } else {
+      //   toast.error(response.data.message || "Signup failed");
+      // }
     } catch (err) {
-      toast.error(err.response?.data?.message || "Something went wrong");
+      toast.error(err.response?.data?.message || "Something went wrong to send otp");
     }
   };
 
@@ -134,11 +140,12 @@ const SignupForm = () => {
           >
             Sign Up
           </button>
-          <div className="flex items-center justify-center gap-2 mt-4">
+          {/* this is divider */}
+          {/* <div className="flex items-center justify-center gap-2 mt-4">
             <div className="w-full h-[1px] bg-gray-300"></div>
             <p className="text-gray-500 text-sm">OR</p>
             <div className="w-full h-[1px] bg-gray-300"></div>
-          </div>
+          </div> */}
         </form>
       </div>
     </div>

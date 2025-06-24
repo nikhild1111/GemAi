@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import bodyParser from "body-parser";
 import express from "express";
 import cors from 'cors';
+import authRoutes from "./Routes/auth.js";
 import { dbConnect } from "./Config/database.js";
 import cookieParser from "cookie-parser";
 import Links from "./Routes/Linksuser.js";
@@ -12,7 +13,8 @@ import User from "./models/UserData.js"; // Needed for saveTopic route
 
 const app = express();
 dotenv.config();
-
+// ✅ Add this line to parse JSON bodies
+app.use(express.json());
 //  Use env var instead of hardcoding API key (secure)
 // const gemini_api_key = "AIzaSyAutDY9WF-UqQ3m99DTmQGKtPvXIT-_9hg";
 const gemini_api_key = process.env.GEMINI_API_KEY;
@@ -27,7 +29,6 @@ const port = process.env.PORT || 3000;
 
 //  Middlewares
 app.use(bodyParser.json());
-app.use(express.json());
 app.use(cors({
   origin: "http://localhost:5173", // React frontend
   credentials: true               // 👈 allow sending cookies
@@ -41,6 +42,21 @@ dbConnect();
 
 // Main route
 app.use("/api/v1", Links, history);
+app.use("/api", authRoutes);
+import ResumeRoute from './Routes/ResumeRoute.js';
+app.use('/api/resume', ResumeRoute);
+
+//  What happens when you call POST /api/content?
+// Express checks: does this match /api?
+// Yes — because /api/content starts with /api.
+
+// So it checks inside authRoutes if there's a route like /content.
+//  If not found in authRoutes, it moves on.
+
+// Next, Express checks: is there a direct match with app.post("/api/content")?
+//  Yes — so it runs that route handler.
+
+
 
 // Generate content function
 const generate = async (question) => {
@@ -57,35 +73,46 @@ const generate = async (question) => {
 app.post('/api/content', async (req, res) => {
   let { question } = req.body;
 
-  const prompt = `
-Give me a well-structured explanation on the topic: "${question}".
+ const prompt = `
+You are an intelligent AI teacher.
 
-Your response should be in this format:
+Based on the following question: "${question}", do the following:
 
-1. First, provide a short and clear **definition** of the topic in 1-2 lines.
+1. Generate a clean and short **title** for this topic (max 4-6 words), suitable to be stored as a key in a database. Make it simple, clear, and relevant. Write it on a single line like:  
+**Title:** Your Title Here
 
-2. Then list **five major headings** (main concepts or aspects of the topic), each starting with numbering like 1, 2, 3...
+2. Then give a clear **definition** of the topic in 1-2 lines.
 
-3. Under each heading, give **2-3 key points**. Each key point should start with a "-" symbol like this at it only one symbol:
+3. Then list **five major headings** (main concepts or aspects of the topic), each starting with numbering like 1, 2, 3...
 
-4.dont give the starts plaese .
+4. Under each heading, give **2-3 key points**. Each key point should start with a single "-" symbol. Do NOT use "*", or bullet emojis.
 
-Example Output:
+Important Notes:
+- Do NOT start with "Sure", "Here's", or any extra text.
+- Do NOT include markdown symbols like "**", "*", or "->"
+- Keep the language simple, clean, and easy to read for college-level students.
+
+Expected Output Format:
+Title: [Simple Title Here]
+
 Definition: [Your definition here]
 
-1. Heading 1
-> Subpoint A  
-> Subpoint B  
+1. Heading 1  
+- Subpoint A  
+- Subpoint B  
+- Subpoint C
+- Subpoint d
 
 2. Heading 2  
-> Subpoint A  
-> Subpoint B  
-> Subpoint C  
+- Subpoint A  
+- Subpoint B  
+- Subpoint C
 
-Make the explanation simple, clear, and suitable for college-level students.
+(Continue up to 5 headings)
 `;
   try {
     const result = await generate(prompt);
+    console.log(result);
     res.json({
       success: true,
       result: result,
@@ -137,6 +164,29 @@ app.get("/api/getTopics", verifyToken, async (req, res) => {
   } catch (err) {
     console.error("Error fetching topics:", err);
     res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// DELETE /api/deleteTopic/:topic - Delete a topic permanently
+app.delete('/api/deleteTopic/:topic', verifyToken, async (req, res) => {
+  const topic = decodeURIComponent(req.params.topic);
+  const userId = req.user.id;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (user.topics.hasOwnProperty(topic)) {
+      delete user.topics[topic];
+      user.markModified('topics'); // Important to persist nested changes
+      await user.save();
+      return res.status(200).json({ success: true, message: 'Topic deleted successfully' });
+    } else {
+      return res.status(404).json({ success: false, message: 'Topic not found' });
+    }
+  } catch (err) {
+    console.error('Error deleting topic:', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
 

@@ -42,7 +42,7 @@ toast.error("Please Enter a text")
 
     //  small issue: you're setting topic using setTopic(...) and immediately using it in localStorage.setItem(...), which won't work correctly because setTopic is asynchronous — the topic value won't update instantly.
     // setTopic('Give me best 5 quotes and their examples');
-    const surpriseTopic = 'Give me best 5 quotes and their examples';
+    const surpriseTopic = 'Give me the todays 5 most important news stories from around the world  with some description. ';
     setTopic(surpriseTopic);
     localStorage.setItem('topic', surpriseTopic);
     navigate('/flashcards');

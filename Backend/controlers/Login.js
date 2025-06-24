@@ -32,6 +32,7 @@ export const Login = async (req, res) => {
       });
     }
 
+    
     // 4. Create JWT token
     const payload = {
       email: user.email,
@@ -42,7 +43,7 @@ export const Login = async (req, res) => {
     const token = jwt.sign(
       payload,
       process.env.JWT_SECRET || "LASTCHANSE", // fallback if env var is missing
-      { expiresIn: "30s" }
+      { expiresIn: "2h" }
     );
 
     // 5. Set token in cookie
@@ -51,12 +52,14 @@ export const Login = async (req, res) => {
     const options = {
       // expires: new Date(Date.now() + tokenExpiryDuration),
       maxAge: 24 * 60 * 60 * 1000, // 1 day
-      httpOnly: false,
+     httpOnly: true,
+      sameSite: 'Lax'
     };
 
     res.cookie("token", token, options).status(200).json({
       success: true,
       token,
+        secure: process.env.NODE_ENV === 'production',
       message: "User login successful",
     });
 
