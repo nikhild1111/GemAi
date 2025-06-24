@@ -1,5 +1,5 @@
 import React from 'react';
-import SignupForm from '../Components/SignupForm';
+import SignupForm from '../components/SignupForm';
 
 const Signup = (props) => {
   let setIsLoggedIn = props.setIsLoggedIn;
