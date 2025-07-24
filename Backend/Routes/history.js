@@ -1,6 +1,6 @@
 import express from "express";
 import verifyToken from "../middlewares/verifyToken.js";
-import { getHistory } from "../controlers/History.js";
+import { getHistory } from "../controllers/History.js";
 
 const router = express.Router();
 

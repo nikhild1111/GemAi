@@ -1,6 +1,6 @@
 import express from 'express';
 import pdfParse from 'pdf-parse';
-import { generateQuestionsFromResume } from '../controlers/resumeController.js';
+import { generateQuestionsFromResume } from '../controllers/resumeController.js';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const multer = require('multer');

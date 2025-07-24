@@ -1,7 +1,7 @@
 import express from "express";
-import { Signup } from "../controlers/Signup.js";
-import { Login } from "../controlers/Login.js";
-import { googleLoginController } from "../controlers/google.js";
+import { Signup } from "../controllers/Signup.js";
+import { Login } from "../controllers/Login.js";
+import { googleLoginController } from "../controllers/google.js";
 
 // import { auth, isPrimum, isAdmin } from "../middlewares/auth.js"; // Uncomment when ready
 

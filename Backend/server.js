@@ -57,6 +57,11 @@ app.use("/api", authRoutes);
 import ResumeRoute from './Routes/ResumeRoute.js';
 app.use('/api/resume', ResumeRoute);
 
+
+import notesRoutes from './Routes/notesRoutes.js';
+
+// Add this route after your existing routes
+app.use('/api/notes', notesRoutes);
 //  What happens when you call POST /api/content?
 // Express checks: does this match /api?
 // Yes — because /api/content starts with /api.
