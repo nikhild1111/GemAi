@@ -4,7 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import axios from "axios";
 import { useAppContext } from '../context/AppContext';
+
+import { getAuthHeaders } from "../utils/authHeader";
+const Backend_url = import.meta.env.VITE_BACKEND_URL;
 const SignupForm = () => {
+
 
   const {setIsLoggedIn,setToken}=useAppContext();
   const navigate = useNavigate();
@@ -33,7 +37,11 @@ const SignupForm = () => {
 
       //  fiest go to the otp and check it then come back to the signup page 
 
-      await axios.post("http://localhost:3000/api/send-otp", { email });
+
+
+
+      await axios.post(`${Backend_url}/list/api/send-otp`, { email });
+
       navigate("/verify", { state: { email,name,password,phone } });
 
       // const response = await axios.post("http://localhost:3000/api/v1/signup", {

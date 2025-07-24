@@ -6,6 +6,9 @@ import axios from 'axios';
 import { useAppContext } from '../context/AppContext';
 import Cookies from 'js-cookie';
 import { GoogleLogin } from '@react-oauth/google';
+
+import { getAuthHeaders } from "../utils/authHeader";
+const Backend_url = import.meta.env.VITE_BACKEND_URL;
 const LoginForm = () => {
 
   const { setIsLoggedIn, setToken } = useAppContext();
@@ -28,9 +31,7 @@ const LoginForm = () => {
     if (!isValidPassword(password)) return toast.error('Password must be strong');
 
     try {
-      const response = await axios.post('http://localhost:3000/api/v1/login', { email, password },  {
-        withCredentials: true, // 👈 MUST
-      });
+      const response = await axios.post(`${Backend_url}/api/v1/login`, { email, password }, getAuthHeaders());
 
       const token = Cookies.get('token');
       // alert('Token:', token);

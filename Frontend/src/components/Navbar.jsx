@@ -138,6 +138,8 @@
 import React from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { StickyNote } from "lucide-react";
+
 import { useAppContext } from '../context/AppContext';
 import {
   FaBars,
@@ -177,6 +179,9 @@ const Navbar = () => {
     
     } else if (type === 'uploadresume') {
       toast.success('Resume feature coming soon!');
+    
+    } else if (type === 'notes') {
+      navigate('/notes');
     }
   };
 
@@ -230,7 +235,7 @@ const Navbar = () => {
       {showMenu && isLogin && (
         <div className="absolute top-16 right-4 bg-white text-black shadow-lg rounded-lg p-4 z-50 w-48">
           <ul className="space-y-2">
-            <li>
+            {/* <li>
               <button
                 className="flex items-center w-full text-left gap-2 hover:bg-gray-100 px-2 py-2 rounded"
                 onClick={() => handlePopup('uploadresume')}
@@ -245,7 +250,15 @@ const Navbar = () => {
               >
                 <BsMicFill /> Voice Q&A
               </button>
-            </li>
+            </li> */}
+               <li>
+              <button
+                className="flex items-center w-full text-left gap-2 hover:bg-gray-100 px-2 py-2 rounded"
+                onClick={() =>  handlePopup('notes')}
+              >
+              <StickyNote size={24} color="#4A4A4A" /> Notes
+              </button>
+            </li> 
          
             <li>
               <button

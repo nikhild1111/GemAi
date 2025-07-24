@@ -84,6 +84,8 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { getAuthHeaders } from "../utils/authHeader";
+const Backend_url = import.meta.env.VITE_BACKEND_URL;
 
 const VerifyOtpPage = () => {
   const { state } = useLocation();
@@ -102,10 +104,10 @@ const VerifyOtpPage = () => {
         return;
       }
 
-      const res = await axios.post("http://localhost:3000/api/verify-otp", { email, otp });
+      const res = await axios.post(`${Backend_url}/api/verify-otp`, { email, otp });
       setMessage(res.data.message);
 
-      const response = await axios.post("http://localhost:3000/api/v1/signup", { name, email, password, phone });
+      const response = await axios.post(`${Backend_url}/api/v1/signup`, { name, email, password, phone });
 
       if (response.data.success) {
         const { token } = response.data;
@@ -139,7 +141,7 @@ const VerifyOtpPage = () => {
     setResending(true);
 
     try {
-      await axios.post("http://localhost:3000/api/send-otp", { email });
+      await axios.post(`${Backend_url}/api/send-otp`, { email });
       setMessage("OTP resent");
       toast.success("OTP resent successfully");
     } catch (err) {

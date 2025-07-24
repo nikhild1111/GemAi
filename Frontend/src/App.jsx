@@ -18,6 +18,7 @@ import QnA from './pages/QnA';
 import UploadResume from './pages/UploadResume';
 import { useContext } from "react";
 import VerifyOtpPage from "./pages/VerifyOtpPage";
+import Notes from "./components/Notes";
 // import jwt_decode from 'jwt-decode'; // This should work for your case
 
 // import { useEffect } from "react";
@@ -81,6 +82,7 @@ const App = () => {
         <Route path="/premium" element={<Premium />} />
         <Route path="/saved" element={<Saved />} />
         <Route path="/quiz" element={<Quiz />} />
+        <Route path="/notes" element={<Notes />} />
       </Routes>
     </Router>
        </GoogleOAuthProvider>

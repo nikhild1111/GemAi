@@ -184,6 +184,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAppContext } from '../context/AppContext';
+import { getAuthHeaders } from "../utils/authHeader";
+const Backend_url = import.meta.env.VITE_BACKEND_URL;
 
 const Flashcards = () => {
   const { topic, setTopic } = useAppContext();
@@ -199,7 +201,7 @@ const Flashcards = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await axios.post('http://localhost:3000/api/content', {
+        const res = await axios.post(`${Backend_url}/api/content`, {
           question: topic,
         });
 
