@@ -22,3 +22,20 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+# Ignore frontend files
+Frontend/node_modules/
+Frontend/.env
+Frontend/dist/
+Frontend/build/
+Frontend/.vite/
+Frontend/.DS_Store
+Frontend/.vscode/
+
+# If you have a backend folder too:
+Backend/node_modules/
+Backend/.env
+
+# General ignore rules
+*.log
+*.log.*
+*.tsbuildinfo
