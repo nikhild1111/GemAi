@@ -31,8 +31,8 @@ const port = process.env.PORT || 3000;
 app.use(bodyParser.json());
 // Replace this with your actual frontend URL
 const allowedOrigins = [
-  "http://localhost:5173",            // for local dev
-  "https://gemai-1.onrender.com"      // for deployed frontend
+  "https://gemai-1.onrender.com",  // Your deployed frontend
+  "http://localhost:5173"          // For local testing
 ];
 
 app.use(cors({
