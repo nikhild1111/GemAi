@@ -244,7 +244,7 @@ const Flashcards = () => {
       if (!token) return alert("⚠️ You are not logged in.");
 
       const response = await axios.patch(
-        "http://localhost:3000/api/saveTopic",
+        `${Backend_url }/api/saveTopic`,
         { topic: title, cards: [definition, ...topics] }, // ✅ use title here
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -263,7 +263,7 @@ const Flashcards = () => {
   const handleQuiz = async () => {
     setLoadingQuiz(true);
     try {
-      const response = await axios.post("http://localhost:3000/api/quiz", {
+      const response = await axios.post(`${Backend_url }/api/quiz`, {
         topic: title,
         definition,
       });

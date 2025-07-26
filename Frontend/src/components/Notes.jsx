@@ -434,7 +434,7 @@ const NotesPage = () => {
   const [formData, setFormData] = useState({ question: '', answer: '' });
   const [deleteConfirm, setDeleteConfirm] = useState(null);
 
-  const API_BASE = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+  const API_BASE = import.meta.env.VITE_BACKEND_URL;
 
   // Fetch notes from API
   const fetchNotes = async () => {

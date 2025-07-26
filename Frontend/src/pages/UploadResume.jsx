@@ -2,6 +2,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
+import { getAuthHeaders } from "../utils/authHeader";
+const Backend_url = import.meta.env.VITE_BACKEND_URL;
+
 const UploadResume = () => {
   const [file, setFile] = useState(null);
   const [uploadMessage, setUploadMessage] = useState('');
@@ -12,7 +15,7 @@ const UploadResume = () => {
     formData.append("resume", file);
 
     try {
-      const res = await axios.post("http://localhost:3000/api/resume/upload", formData);
+      const res = await axios.post(`${Backend_url }/api/resume/upload`, formData);
       setUploadMessage("Resume uploaded and processed! Questions generated.");
       console.log(res.data); // contains the generated questions
       // Navigate to QnA page or store questions in context
