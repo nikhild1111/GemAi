@@ -40,7 +40,7 @@ const SignupForm = () => {
 
 
 
-      await axios.post(`${Backend_url}/list/api/send-otp`, { email });
+      await axios.post(`${Backend_url}/api/send-otp`, { email });
 
       navigate("/verify", { state: { email,name,password,phone } });
 
