@@ -423,7 +423,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Search, Plus, Edit3, Trash2, Save, X, Eye } from 'lucide-react';
-
+import axios from 'axios';
 const NotesPage = () => {
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -433,20 +433,20 @@ const NotesPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [formData, setFormData] = useState({ question: '', answer: '' });
   const [deleteConfirm, setDeleteConfirm] = useState(null);
-
+const token = localStorage.getItem("token"); // or sessionStorage / Redux
   const API_BASE = import.meta.env.VITE_BACKEND_URL;
 
   // Fetch notes from API
   const fetchNotes = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE}/api/notes/all`, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+   const response = await axios.get(`${API_BASE}/api/notes/all`, {
+  headers: {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json',
+  },
+  withCredentials: true, // needed only if your server sets cookies
+});
       
       if (response.ok) {
         const data = await response.json();
