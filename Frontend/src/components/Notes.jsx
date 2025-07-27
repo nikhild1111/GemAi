@@ -421,9 +421,12 @@
 
 
 
+// src/pages/NotesPage.jsx
 import React, { useState, useEffect } from 'react';
 import { Search, Plus, Edit3, Trash2, Save, X, Eye } from 'lucide-react';
 import axios from 'axios';
+import { getAuthHeaders } from '../utils/authHeader';
+
 const NotesPage = () => {
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -433,25 +436,15 @@ const NotesPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [formData, setFormData] = useState({ question: '', answer: '' });
   const [deleteConfirm, setDeleteConfirm] = useState(null);
-const token = localStorage.getItem("token"); // or sessionStorage / Redux
+
   const API_BASE = import.meta.env.VITE_BACKEND_URL;
 
-  // Fetch notes from API
+  // ✅ Fetch all notes
   const fetchNotes = async () => {
     setLoading(true);
     try {
-   const response = await axios.get(`${API_BASE}/api/notes/all`, {
-  headers: {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json',
-  },
-  withCredentials: true, // needed only if your server sets cookies
-});
-      
-      if (response.ok) {
-        const data = await response.json();
-        setNotes(data.notes || []);
-      }
+      const response = await axios.get(`${API_BASE}/api/notes/all`, getAuthHeaders());
+      setNotes(response.data.notes || []);
     } catch (error) {
       console.error('Error fetching notes:', error);
     } finally {
@@ -459,27 +452,16 @@ const token = localStorage.getItem("token"); // or sessionStorage / Redux
     }
   };
 
-  // Search notes
+  // ✅ Search notes
   const searchNotes = async (query) => {
-    if (!query.trim()) {
-      fetchNotes();
-      return;
-    }
-
+    if (!query.trim()) return fetchNotes();
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE}/api/notes/search?query=${encodeURIComponent(query)}`, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        setNotes(data.notes || []);
-      }
+      const response = await axios.get(
+        `${API_BASE}/api/notes/search?query=${encodeURIComponent(query)}`,
+        getAuthHeaders()
+      );
+      setNotes(response.data.notes || []);
     } catch (error) {
       console.error('Error searching notes:', error);
     } finally {
@@ -487,7 +469,7 @@ const token = localStorage.getItem("token"); // or sessionStorage / Redux
     }
   };
 
-  // Create new note
+  // ✅ Create new note
   const createNote = async () => {
     if (!formData.question.trim() || !formData.answer.trim()) {
       alert('Please fill in both question and answer');
@@ -496,20 +478,10 @@ const token = localStorage.getItem("token"); // or sessionStorage / Redux
 
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE}/api/notes/create`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        setFormData({ question: '', answer: '' });
-        setShowAddForm(false);
-        fetchNotes();
-      }
+      await axios.post(`${API_BASE}/api/notes/create`, formData, getAuthHeaders());
+      setFormData({ question: '', answer: '' });
+      setShowAddForm(false);
+      fetchNotes();
     } catch (error) {
       console.error('Error creating note:', error);
     } finally {
@@ -517,7 +489,7 @@ const token = localStorage.getItem("token"); // or sessionStorage / Redux
     }
   };
 
-  // Update note
+  // ✅ Update note
   const updateNote = async () => {
     if (!formData.question.trim() || !formData.answer.trim()) {
       alert('Please fill in both question and answer');
@@ -526,20 +498,14 @@ const token = localStorage.getItem("token"); // or sessionStorage / Redux
 
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE}/api/notes/${editingNote._id}`, {
-        method: 'PUT',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        setEditingNote(null);
-        setFormData({ question: '', answer: '' });
-        fetchNotes();
-      }
+      await axios.put(
+        `${API_BASE}/api/notes/${editingNote._id}`,
+        formData,
+        getAuthHeaders()
+      );
+      setEditingNote(null);
+      setFormData({ question: '', answer: '' });
+      fetchNotes();
     } catch (error) {
       console.error('Error updating note:', error);
     } finally {
@@ -547,19 +513,13 @@ const token = localStorage.getItem("token"); // or sessionStorage / Redux
     }
   };
 
-  // Delete note
+  // ✅ Delete note
   const deleteNote = async (noteId) => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE}/api/notes/${noteId}`, {
-        method: 'DELETE',
-        credentials: 'include',
-      });
-
-      if (response.ok) {
-        fetchNotes();
-        setDeleteConfirm(null);
-      }
+      await axios.delete(`${API_BASE}/api/notes/${noteId}`, getAuthHeaders());
+      fetchNotes();
+      setDeleteConfirm(null);
     } catch (error) {
       console.error('Error deleting note:', error);
     } finally {
@@ -567,6 +527,17 @@ const token = localStorage.getItem("token"); // or sessionStorage / Redux
     }
   };
 
+  // Debounced search
+  const handleSearch = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    const timeoutId = setTimeout(() => {
+      searchNotes(query);
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  };
   // Show delete confirmation
   const showDeleteConfirm = (note) => {
     setDeleteConfirm(note);
@@ -574,19 +545,7 @@ const token = localStorage.getItem("token"); // or sessionStorage / Redux
     setViewingNote(null);
   };
 
-  // Handle search
-  const handleSearch = (e) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-    
-    // Debounce search
-    const timeoutId = setTimeout(() => {
-      searchNotes(query);
-    }, 500);
-
-    return () => clearTimeout(timeoutId);
-  };
-
+ 
   // Open edit form
   const openEditForm = (note) => {
     setEditingNote(note);
@@ -885,3 +844,23 @@ const token = localStorage.getItem("token"); // or sessionStorage / Redux
 };
 
 export default NotesPage;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // Rest of your component remains unchanged...
