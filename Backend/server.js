@@ -10,7 +10,7 @@ import Links from "./Routes/Linksuser.js";
 import history from "./Routes/history.js";
 import verifyToken from "./middlewares/verifyToken.js";  // Don't forget to import this
 import User from "./models/UserData.js"; // Needed for saveTopic route
-
+import Extracttext from './Routes/Extracttext.js'
 const app = express();
 dotenv.config();
 // ✅ Add this line to parse JSON bodies
@@ -56,7 +56,7 @@ app.use("/api/v1", Links, history);
 app.use("/api", authRoutes);
 import ResumeRoute from './Routes/ResumeRoute.js';
 app.use('/api/resume', ResumeRoute);
-
+app.use('/extract',Extracttext);
 
 import notesRoutes from './Routes/notesRoutes.js';
 

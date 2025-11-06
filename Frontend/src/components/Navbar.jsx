@@ -170,7 +170,8 @@ const Navbar = () => {
     if (type === 'saved') {
                 navigate('/saved');
     } else if (type === 'premium') {
-      toast.success("Premium launching soon");
+      // toast.success("Premium launching soon");
+      navigate('/premium')
     } else if (type === 'history') {
       toast.success('History feature coming soon!');
     

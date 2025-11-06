@@ -1,5 +1,12 @@
 import React from 'react';
+import Test from '../components/Test';
 
-const Premium = () => <div className="p-8">Coming soon: Premium Features!</div>;
+const Premium = () => {
+  return (
+    <div>
+      <Test></Test>
+    </div>
+  )
+}
 
-export default Premium;
+export default Premium
