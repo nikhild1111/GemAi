@@ -422,6 +422,9 @@
 
 
 // src/pages/NotesPage.jsx
+
+
+
 import React, { useState, useEffect } from 'react';
 import { Search, Plus, Edit3, Trash2, Save, X, Eye } from 'lucide-react';
 import axios from 'axios';

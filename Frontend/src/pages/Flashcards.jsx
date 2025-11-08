@@ -1,41 +1,43 @@
 
 
-
 // import React, { useState, useEffect } from 'react';
 // import axios from 'axios';
 // import { useNavigate } from 'react-router-dom';
 // import toast from 'react-hot-toast';
 // import { useAppContext } from '../context/AppContext';
+// import { getAuthHeaders } from "../utils/authHeader";
+// const Backend_url = import.meta.env.VITE_BACKEND_URL;
 
 // const Flashcards = () => {
+//   const { topic, setTopic } = useAppContext();
 
-// const { topic,setTopic }=useAppContext();
+//   const [title, setTitle] = useState('');
 //   const [definition, setDefinition] = useState('');
 //   const [topics, setTopics] = useState([]);
 //   const [loading, setLoading] = useState(true);
-//   const [loadingQuiz, setLoadingQuiz] = useState(false);  // Track quiz loading state
+//   const [loadingQuiz, setLoadingQuiz] = useState(false);
 
 //   const navigate = useNavigate();
 
 //   useEffect(() => {
 //     async function fetchData() {
 //       try {
-//         const res = await axios.post('http://localhost:3000/api/content', {
+//         const res = await axios.post(`${Backend_url}/api/content`, {
 //           question: topic,
 //         });
 
-//         const rawCards = res.data.result;
-//         // console.log(rawCards);
-//         const lines = rawCards.split('\n').filter(Boolean);
-// // console.log(lines);
-//         const parsedTopics = [];
+//         const raw = res.data.result;
+//         const lines = raw.split('\n').filter(Boolean);
+
 //         let currentTopic = null;
+//         const parsedTopics = [];
 
 //         lines.forEach((line, index) => {
-//           if (index === 0 && line.toLowerCase().startsWith("definition")) {
+//           if (index === 0 && line.toLowerCase().startsWith('title')) {
+//             setTitle(line.replace(/^Title:\s*/i, '').trim());
+//           } else if (line.toLowerCase().startsWith('definition')) {
 //             setDefinition(line.replace(/^Definition:\s*/i, '').trim());
 //           } else if (/^\d+\./.test(line)) {
-//             // Matches lines like "1. Machine Learning"
 //             if (currentTopic) parsedTopics.push(currentTopic);
 //             currentTopic = { heading: line.trim(), points: [] };
 //           } else if (line.startsWith('-')) {
@@ -43,64 +45,58 @@
 //           }
 //         });
 
-//         if (currentTopic) parsedTopics.push(currentTopic); // Add the last one
+//         if (currentTopic) parsedTopics.push(currentTopic);
 //         setTopics(parsedTopics);
-//         setLoading(false);
 //       } catch (err) {
-//         toast.error('please enter topic again')
-//         navigate('/');
 //         console.error('Error:', err);
+//         toast.error('⚠️ Please enter topic again.');
+//         navigate('/');
+//       } finally {
 //         setLoading(false);
 //       }
 //     }
 
-// // console.log(topic);
 //     fetchData();
 //   }, [topic]);
+
 //   const handleSave = async () => {
 //     try {
 //       const token = localStorage.getItem("token");
-//       if (!token) return alert("⚠️ You are not logged in.");
-  
-//       // Using PATCH request instead of POST
+//       if (!token) return toast.error("⚠️ You are not logged in.");
+
 //       const response = await axios.patch(
-//         "http://localhost:3000/api/saveTopic",
-//         { topic, cards: [definition, ...topics] },
-//         { headers: { Authorization: `Bearer ${token}` },
-//        }
+//         `${Backend_url }/api/saveTopic`,
+//         { topic: title, cards: [definition, ...topics] }, // ✅ use title here
+//         { headers: { Authorization: `Bearer ${token}` } }
 //       );
-  
+
 //       if (response.status === 200) {
-//         toast.success("Flashcards saved successfully!");
+//         toast.success("✅ Flashcards saved successfully!");
 //       } else {
-//         toast.error(`Failed to save: ${response.data.message}`);
+//         toast.error(`❌ Failed to save: ${response.data.message}`);
 //       }
 //     } catch (error) {
 //       console.error("Error saving flashcards:", error);
-//       alert("⚠️ Something went wrong while saving.");
+//       toast.error("⚠️ Something went wrong while saving.");
 //     }
 //   };
-  
 
 //   const handleQuiz = async () => {
-//     setLoadingQuiz(true);  // Set loading state to true when quiz is being fetched
-
+//     setLoadingQuiz(true);
 //     try {
-//       const response = await axios.post("http://localhost:3000/api/quiz", {
-//         topic,
+//       const response = await axios.post(`${Backend_url }/api/quiz`, {
+//         topic: title,
 //         definition,
 //       });
 
 //       const quizData = response.data.quiz;
-
-//       // ✅ Navigate and pass quizData
-//       navigate("/quiz", { state: { topic, quizData } });
-
-//       setLoadingQuiz(false);  // Reset loading state after navigating
+//       // console.log(quizData)
+//       navigate("/quiz", { state: { topic: title, quizData } });
 //     } catch (error) {
 //       console.error("Quiz generation failed:", error);
-//       toast.error(" Failed to generate quiz");
-//       setLoadingQuiz(false);  // Reset loading state in case of an error
+//       toast.error("❌ Failed to generate quiz");
+//     } finally {
+//       setLoadingQuiz(false);
 //     }
 //   };
 
@@ -110,14 +106,17 @@
 
 //   return (
 //     <div className="container mx-auto p-6 max-w-5xl bg-white rounded-xl shadow-xl">
-//       <h1 className="text-3xl font-semibold text-center text-blue-600 mb-8">
-//         Topic: <span className="text-gray-800 font-medium">{topic}</span>
-//       </h1>
-
 //       {loading ? (
 //         <p className="text-center text-gray-600">Generating flashcards...</p>
 //       ) : (
 //         <>
+//           {/* Title */}
+//           {title && (
+//             <h1 className="text-4xl font-bold text-center text-blue-700 mb-4">
+//               {title}
+//             </h1>
+//           )}
+
 //           {/* Definition */}
 //           {definition && (
 //             <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-900 p-6 mb-6 rounded-lg shadow-md">
@@ -127,58 +126,52 @@
 
 //           {/* Topics and Subpoints */}
 //           <div className="space-y-6">
-//             {topics.map((topic, index) => (
+//             {topics.map((t, index) => (
 //               <div key={index} className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
-//                 <h2 className="text-2xl font-semibold text-blue-800 mb-4">{topic.heading}</h2>
+//                 <h2 className="text-2xl font-semibold text-blue-800 mb-4">{t.heading}</h2>
 //                 <ul className="list-disc list-inside space-y-2 text-gray-700">
-//                   {topic.points.map((point, i) => (
+//                   {t.points.map((point, i) => (
 //                     <li key={i}>{point}</li>
 //                   ))}
 //                 </ul>
 //               </div>
 //             ))}
 //           </div>
-//         </>
-//       )}
 
-//       {/* Bottom buttons */}
-//       <div className="mt-8 flex flex-col md:flex-row gap-6 justify-center">
-//         <button
-//           onClick={handleSave}
-//           className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-xl transition duration-300 transform hover:scale-105"
-//         >
-//           Save
-//         </button>
-//         <button
-//           onClick={handleQuiz}
-//           disabled={loadingQuiz}
-//           className={`${
-//             loadingQuiz ? 'bg-gray-400 cursor-not-allowed' : 'bg-yellow-500 hover:bg-yellow-600'
-//           } text-white px-8 py-3 rounded-xl transition duration-300 transform hover:scale-105`}
-//         >
-//           {loadingQuiz ? 'Generating Quiz...' : 'Quiz Me'}
-//         </button>
-//         <button
-//           onClick={handleAsk}
-//           className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl transition duration-300 transform hover:scale-105"
-//         >
-//           Ask Me
-//         </button>
-//       </div>
-
-//       {/* Loading Indicator */}
-//       {loadingQuiz && (
-//         <div className="flex justify-center mt-4">
-//           <div className="spinner-border animate-spin text-yellow-500" role="status">
-//             <span className="sr-only">Loading...</span>
+//           {/* Bottom Buttons */}
+//           <div className="mt-10 flex flex-col md:flex-row gap-6 justify-center">
+//             <button
+//               onClick={handleSave}
+//               className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-xl transition duration-300 transform hover:scale-105"
+//             >
+//               Save
+//             </button>
+//             <button
+//               onClick={handleQuiz}
+//               disabled={loadingQuiz}
+//               className={`${
+//                 loadingQuiz ? 'bg-gray-400 cursor-not-allowed' : 'bg-yellow-500 hover:bg-yellow-600'
+//               } text-white px-8 py-3 rounded-xl transition duration-300 transform hover:scale-105`}
+//             >
+//               {loadingQuiz ? 'Generating Quiz...' : 'Quiz Me'}
+//             </button>
+//             <button
+//               onClick={handleAsk}
+//               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl transition duration-300 transform hover:scale-105"
+//             >
+//               Ask Me
+//             </button>
 //           </div>
-//         </div>
+//         </>
 //       )}
 //     </div>
 //   );
 // };
 
 // export default Flashcards;
+
+
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -228,7 +221,7 @@ const Flashcards = () => {
         setTopics(parsedTopics);
       } catch (err) {
         console.error('Error:', err);
-        toast.error('⚠️ Please enter topic again.');
+        toast.error('Please enter topic again');
         navigate('/');
       } finally {
         setLoading(false);
@@ -241,38 +234,39 @@ const Flashcards = () => {
   const handleSave = async () => {
     try {
       const token = localStorage.getItem("token");
-      if (!token) return alert("⚠️ You are not logged in.");
+      if (!token) return toast.error("You are not logged in");
 
       const response = await axios.patch(
-        `${Backend_url }/api/saveTopic`,
-        { topic: title, cards: [definition, ...topics] }, // ✅ use title here
+        `${Backend_url}/api/saveTopic`,
+        { topic: title, cards: [definition, ...topics] },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       if (response.status === 200) {
-        toast.success("✅ Flashcards saved successfully!");
+        toast.success("Flashcards saved successfully");
       } else {
-        toast.error(`❌ Failed to save: ${response.data.message}`);
+        toast.error(`Failed to save: ${response.data.message}`);
       }
     } catch (error) {
       console.error("Error saving flashcards:", error);
-      toast.error("⚠️ Something went wrong while saving.");
+      toast.error("Something went wrong while saving");
     }
   };
 
   const handleQuiz = async () => {
     setLoadingQuiz(true);
     try {
-      const response = await axios.post(`${Backend_url }/api/quiz`, {
+      const response = await axios.post(`${Backend_url}/api/quiz`, {
         topic: title,
         definition,
       });
 
       const quizData = response.data.quiz;
+      toast.success("Quiz generated successfully");
       navigate("/quiz", { state: { topic: title, quizData } });
     } catch (error) {
       console.error("Quiz generation failed:", error);
-      toast.error("❌ Failed to generate quiz");
+      toast.error("Failed to generate quiz");
     } finally {
       setLoadingQuiz(false);
     }
@@ -283,65 +277,79 @@ const Flashcards = () => {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-5xl bg-white rounded-xl shadow-xl">
-      {loading ? (
-        <p className="text-center text-gray-600">Generating flashcards...</p>
-      ) : (
-        <>
-          {/* Title */}
-          {title && (
-            <h1 className="text-4xl font-bold text-center text-blue-700 mb-4">
-              {title}
-            </h1>
-          )}
-
-          {/* Definition */}
-          {definition && (
-            <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-900 p-6 mb-6 rounded-lg shadow-md">
-              <strong className="font-semibold">Definition:</strong> {definition}
+    <div className="min-h-screen bg-gray-50 py-10 px-4">
+      <div className="container mx-auto max-w-5xl">
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="relative w-20 h-20 mb-6">
+              <div className="absolute top-0 left-0 w-full h-full border-4 border-blue-200 rounded-full"></div>
+              <div className="absolute top-0 left-0 w-full h-full border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
             </div>
-          )}
+            <p className="text-center text-gray-600 text-lg font-medium">Generating flashcards...</p>
+          </div>
+        ) : (
+          <div className="bg-white rounded-xl shadow-lg p-6 md:p-8">
+            {title && (
+              <h1 className="text-3xl md:text-4xl font-bold text-center text-blue-700 mb-6">
+                {title}
+              </h1>
+            )}
 
-          {/* Topics and Subpoints */}
-          <div className="space-y-6">
-            {topics.map((t, index) => (
-              <div key={index} className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
-                <h2 className="text-2xl font-semibold text-blue-800 mb-4">{t.heading}</h2>
-                <ul className="list-disc list-inside space-y-2 text-gray-700">
-                  {t.points.map((point, i) => (
-                    <li key={i}>{point}</li>
-                  ))}
-                </ul>
+            {definition && (
+              <div className="bg-blue-50 border-l-4 border-blue-500 text-blue-900 p-6 mb-8 rounded-lg shadow-sm">
+                <strong className="font-semibold text-lg">Definition</strong>
+                <p className="mt-2 text-gray-700 leading-relaxed">{definition}</p>
               </div>
-            ))}
-          </div>
+            )}
 
-          {/* Bottom Buttons */}
-          <div className="mt-10 flex flex-col md:flex-row gap-6 justify-center">
-            <button
-              onClick={handleSave}
-              className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-xl transition duration-300 transform hover:scale-105"
-            >
-              Save
-            </button>
-            <button
-              onClick={handleQuiz}
-              disabled={loadingQuiz}
-              className={`${
-                loadingQuiz ? 'bg-gray-400 cursor-not-allowed' : 'bg-yellow-500 hover:bg-yellow-600'
-              } text-white px-8 py-3 rounded-xl transition duration-300 transform hover:scale-105`}
-            >
-              {loadingQuiz ? 'Generating Quiz...' : 'Quiz Me'}
-            </button>
-            <button
-              onClick={handleAsk}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl transition duration-300 transform hover:scale-105"
-            >
-              Ask Me
-            </button>
+            <div className="space-y-6 mb-10">
+              {topics.map((t, index) => (
+                <div 
+                  key={index} 
+                  className="bg-white rounded-xl shadow-md p-6 border border-gray-200 hover:shadow-lg transition-all duration-300"
+                >
+                  <h2 className="text-xl md:text-2xl font-semibold text-blue-800 mb-4">{t.heading}</h2>
+                  <ul className="space-y-3 text-gray-700">
+                    {t.points.map((point, i) => (
+                      <li key={i} className="flex items-start">
+                        <span className="inline-block w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        <span className="leading-relaxed">{point}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-4 justify-center">
+              <button
+                onClick={handleSave}
+                className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-md"
+              >
+                Save
+              </button>
+              <button
+                onClick={handleQuiz}
+                disabled={loadingQuiz}
+                className={`${
+                  loadingQuiz ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+                } text-white px-8 py-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-md flex items-center justify-center gap-2`}
+              >
+                {loadingQuiz && (
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                )}
+                {loadingQuiz ? 'Generating Quiz...' : 'Quiz Me'}
+              </button>
+              <button
+                onClick={handleAsk}
+                className="bg-yellow-500 hover:bg-yellow-600 text-white px-8 py-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-md"
+              >
+                Ask Me
+              </button>
+            </div>
           </div>
-        </>
-      )}
+        )}
+      </div>
     </div>
   );
 };

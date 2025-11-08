@@ -93,9 +93,11 @@ function TestInstructions({ testData, onStartTest, onGoBack }) {
     );
   }
 
-  const handleStartTest = () => {
-    onStartTest(questions, timeLimit);
-  };
+const handleStartTest = () => {
+  const time = parseInt(timeLimit);
+  const validTime = isNaN(time) || time < 1 ? 1 : time;
+  onStartTest(questions, validTime);
+};
 
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4">
@@ -117,14 +119,16 @@ function TestInstructions({ testData, onStartTest, onGoBack }) {
             <div className="flex items-center justify-between py-2">
               <span className="text-gray-700 font-medium">Time Limit:</span>
               <div className="flex items-center gap-3">
-                <input
-                  type="number"
-                  min="5"
-                  max="180"
-                  value={timeLimit}
-                  onChange={(e) => setTimeLimit(parseInt(e.target.value) || 30)}
-                  className="w-20 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+<input
+  type="number"
+  min="1"
+  max="180"
+  value={timeLimit}
+  onChange={(e) => setTimeLimit(e.target.value)}
+  className="w-20 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+/>
+
+
                 <span className="text-blue-600 font-bold">minutes</span>
               </div>
             </div>
